@@ -8,7 +8,6 @@ import binascii
 from binascii import unhexlify
 import logging
 from datetime import datetime
-import time
 from collections import defaultdict
 from serial import SerialException
 from random import randrange
