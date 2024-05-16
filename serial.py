@@ -15,6 +15,7 @@ from random import randint
 import os
 
 #function to get the ESN
+
 def s1c_send():
     try:
         ser= serial.Serial(port=s1cport,timeout=3, baudrate = 9600,bytesize=8, parity='N', stopbits=2,xonxoff=False ) #Serial connect port number
@@ -87,3 +88,25 @@ def read_pymodbus() :
     except SerialException:
         print("Failed to open MODBUS serial port!!!")
     return temperatura
+
+def save_to_json(esn, temperature, timestamp):
+    data = {
+        "esn": esn,
+        "temperature": temperature,
+        "timestamp": timestamp
+    }
+    with open("data_log.json", "a") as file:
+        json.dump(data, file)
+        file.write('\n')
+
+def main_loop():
+    while True:
+        esn = s1c_send()
+        temperature = read_pymodbus()
+        s1c_send_data(temperature)
+        timestamp = datetime.now().isoformat()
+        save_to_json(esn, temperature, timestamp)
+        sleep(2700)  # Sleep for 45 minutes
+
+if __name__ == "__main__":
+    main_loop()
