@@ -11,12 +11,14 @@ from datetime import datetime
 from collections import defaultdict
 from serial import SerialException
 from random import randrange
+import json
 from random import randint
 import os
 
 #function to get the ESN
 
-def s1c_send():
+
+def s1c_send(s1cport):
     try:
         ser= serial.Serial(port=s1cport,timeout=3, baudrate = 9600,bytesize=8, parity='N', stopbits=2,xonxoff=False ) #Serial connect port number
         array = 'aa0501'
@@ -42,7 +44,7 @@ def s1c_send():
         print ("ERROR")
 
 
-def s1c_send_data(datatobesend):
+def s1c_send_data(datatobesend, s1cport):
     try:
         ser= serial.Serial(port=s1cport,timeout=3, baudrate = 9600,bytesize=8, parity='N', stopbits=2,xonxoff=False ) #Serial connect port number
         array = 'AA0826102233' #you can send here truncated or RAW coming from your sensor in the case you use array=datatobesend that is the sensor data
@@ -69,7 +71,6 @@ def s1c_send_data(datatobesend):
     except SerialException:
         print ("ERROR ENVIAR DATA")
         
- 
 def read_pymodbus() :
     try:
         ser= serial.Serial(port=modbusport,timeout=3, baudrate = 19200,bytesize=8, parity='E', stopbits=1,xonxoff=False ) #Serial connect port number
@@ -99,6 +100,26 @@ def save_to_json(esn, temperature, timestamp):
         json.dump(data, file)
         file.write('\n')
 
+
+def main():
+    print("SMARTONE C Communication App")
+    print("----------------------------")
+    s1cport = '/dev/ttyUSB0'
+    # Get ESN
+    esn_response = s1c_send(s1cport)
+    if esn_response:
+        print("ESN Received:", esn_response)
+    else:
+        print("Failed to get ESN")
+
+    # Send a RAW data message
+    example_raw_data = 'AA0E27102233445566778899'  # Example data to be sent as RAW
+    raw_response = s1c_send_data(example_raw_data, s1cport)
+    if raw_response:
+        print("RAW data sent successfully")
+    else:
+        print("Failed to send RAW data")
+
 def main_loop():
     while True:
         esn = s1c_send()
@@ -109,4 +130,4 @@ def main_loop():
         sleep(2700)  # Sleep for 45 minutes
 
 if __name__ == "__main__":
-    main_loop()
+    main()
