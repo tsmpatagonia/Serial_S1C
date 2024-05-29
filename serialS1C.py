@@ -9,7 +9,7 @@ from binascii import unhexlify
 import logging
 from datetime import datetime
 from collections import defaultdict
-#from serial import SerialException
+from serial import SerialException
 from random import randrange
 import json
 from random import randint
