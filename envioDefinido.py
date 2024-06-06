@@ -95,6 +95,7 @@ def s1c_ESN(s1cport):
 
     except SerialException as e:
         print(f"ERROR: {e}")
+11
 
 
 def s1c_send_data(user_data, s1cport, msg_type):
