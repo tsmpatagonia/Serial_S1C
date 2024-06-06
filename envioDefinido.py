@@ -5,6 +5,7 @@ import platform
 import time
 import serial
 from time import sleep
+import crcmod  # sudo pip install crcmod
 import binascii
 from binascii import unhexlify
 import logging
@@ -22,7 +23,7 @@ def s1c_ESN(s1cport):
         # Configuración de la conexión serial
         ser = serial.Serial(
             port=s1cport,
-            timeout=3,
+            timeout=5,  # Incrementar tiempo de espera
             baudrate=9600,
             bytesize=8,
             parity='N',
@@ -59,7 +60,6 @@ def s1c_ESN(s1cport):
 
         # Leer la respuesta
         x = ser.read(256)
-        print(x)
         response = x.hex()
 
         if response:
@@ -69,14 +69,24 @@ def s1c_ESN(s1cport):
             if response.startswith("aa"):
                 length = int(response[2:4], 16)
                 command_id = response[4:6]
-                # Asumiendo que los últimos 4 caracteres son el CRC
-                esn = response[6:-4]
+                esn_hex = response[6:-4]  # Extraer ESN en hexadecimal
                 crc_received = response[-4:]
+
+                # Convertir ESN de hexadecimal a decimal
+                esn_decimal = int(esn_hex, 16)
+
+                # Formatear ESN al formato deseado
+                esn_formatted = f"0-{esn_decimal}"
 
                 print(f"Length: {length}")
                 print(f"Command ID: {command_id}")
-                print(f"ESN: {esn}")
+                print(f"ESN (Hex): {esn_hex}")
+                print(f"ESN (Decimal): {esn_decimal}")
+                print(f"ESN (Formatted): {esn_formatted}")
                 print(f"CRC Received: {crc_received}")
+
+        else:
+            print("No response received")
 
         # Cerrar la conexión serial
         ser.close()
