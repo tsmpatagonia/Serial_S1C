@@ -88,8 +88,6 @@ def s1c_ESN(s1cport):
         print(f"ERROR: {e}")
 
 
-
-
 def s1c_send_data(datatobesend, s1cport):
     try:
         ser = serial.Serial(port=s1cport, timeout=3, baudrate=9600, bytesize=8,
@@ -97,28 +95,27 @@ def s1c_send_data(datatobesend, s1cport):
         array = datatobesend  # you can send here truncated or RAW coming from your sensor in the case you use array=datatobesend that is the sensor data
         if ser.isOpen():
             print("S1C port opened")
-        print("COMANDO GET DATA")
+        print("COMANDO put DATA")
         crc16_func = crcmod.mkCrcFun(0x11021, initCrc=0x0000, xorOut=0xffff)
         command = bytearray.fromhex(array)  # your command here-
         # generates CRC based on given command
         result = hex(crc16_func(command))
-        crc_1 = unhexlify(result[2] + result[3])
-        crc_2 = unhexlify(result[4] + result[5])
-        command.extend(crc_2+crc_1)  # appending CRC
-        # array + str(crc_1) + str(crc_2)
+        crc_1 = unhexlify(result[2:4])
+        crc_2 = unhexlify(result[4:6])
+        command.extend(crc_2 + crc_1)  # appending CRC
         arraystr = str(binascii.hexlify(command))
         print(arraystr)
-        logging.info('Sending TRUNCATED msg: %s' % arraystr)
+        print('Sending TRUNCATED msg: %s' % arraystr)
         ser.write(serial.to_bytes(command))  # writing host command to smartOne
         x = ser.read(256)
         response = x.hex()
         if response != "":
             print(response)
-        logging.info('TRUNCATED msg successfully sent: %s' % response)
+        print('TRUNCATED msg successfully sent: %s' % response)
         ser.close()
         return response
-    except SerialException as e:
-        print(f"ERROR: {e}")
+    except SerialException:
+        print("ERROR ENVIAR DATA")
 
 
 def read_pymodbus():
@@ -156,17 +153,31 @@ def save_to_json(esn, temperature, timestamp):
 
 
 def main():
-    print("SMARTONE C Communication App")
-    print("----------------------------")
     s1cport = '/dev/ttyUSB0'
-    # Get ESN
-    esn_response = s1c_ESN(s1cport)
-    print("ESN Received:", esn_response)
+    while True:
+        print("\nSMARTONE C Communication App")
+        print("----------------------------")
+        print("1. Averiguar el ESN")
+        print("2. Mandar un mensaje RAW")
+        print("3. Salir")
+        choice = input("Elige una opción: ")
 
-    # Send a RAW data message
-    example_raw_data = '012345678A'  # Example data to be sent as RAW
-    #raw_response = s1c_send_data(example_raw_data, s1cport)
-    #print(raw_response)
+        if choice == '1':
+            esn_response = s1c_ESN(s1cport)
+            print("ESN Received:", esn_response)
+
+        elif choice == '2':
+            raw_data = input(
+                "Introduce el texto a mandar (en formato hexadecimal): ")
+            raw_response = s1c_send_data(raw_data, s1cport)
+            print("Respuesta RAW:", raw_response)
+
+        elif choice == '3':
+            print("Saliendo...")
+            break
+
+        else:
+            print("Opción no válida. Inténtalo de nuevo.")
 
 
 if __name__ == "__main__":
