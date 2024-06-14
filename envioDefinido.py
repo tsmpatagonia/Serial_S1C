@@ -231,7 +231,7 @@ def save_to_json(esn, temperature, timestamp):
 def main():
     s1cport = '/dev/ttyUSB0'
     while True:
-        print("\nSMARTONE C Communication App")
+        print("\nSMARTONE C Super! Communication App")
         print("----------------------------")
         print("1. Averiguar el ESN")
         print("2. Mandar un mensaje")
