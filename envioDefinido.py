@@ -16,6 +16,41 @@ from random import randrange
 import json
 from random import randint
 import os
+import RPi.GPIO as GPIO
+import time
+import datetime
+
+# Set up the GPIO mode
+GPIO.setmode(GPIO.BCM)
+
+# Set up the GPIO pin for reading the DO output
+DO_PIN = 7  # Replace with the actual GPIO pin number
+GPIO.setup(DO_PIN, GPIO.IN)
+
+try:
+    while True:
+        # Read the state of the DO pin
+        gas_present = GPIO.input(DO_PIN)
+
+        # Determine if gas is present or not
+        if gas_present == GPIO.LOW:
+            gas_state = "Gas Present"
+            log_event(gas_state)
+        else:
+            gas_state = "No Gas"
+
+        # Print the gas state
+        print(f"Gas State: {gas_state}")
+        # log_event(gas_state)
+
+        time.sleep(0.5)  # Wait for a short period before reading again
+
+except KeyboardInterrupt:
+    print("Gas detection stopped by user")
+
+finally:
+    # Clean up GPIO settings
+    GPIO.cleanup()
 
 
 def s1c_ESN(s1cport):
@@ -33,13 +68,13 @@ def s1c_ESN(s1cport):
 
         # Comando para obtener el ESN
         array = 'aa0501'
-        time.sleep(3)
+        # time.sleep(3)
 
         if ser.isOpen():
             print("S1C port opened")
 
         print("COMANDO GET ID")
-        time.sleep(5)
+        # time.sleep(5)
 
         # Crear función CRC-16 con el polinomio especificado
         crc16_func = crcmod.mkCrcFun(0x11021, initCrc=0x0000, xorOut=0xffff)
@@ -95,6 +130,8 @@ def s1c_ESN(s1cport):
 
     except SerialException as e:
         print(f"ERROR: {e}")
+
+
 11
 
 
@@ -213,6 +250,8 @@ def main():
                 continue
             user_data = input(
                 "Introduce los datos de usuario en formato alfanumérico: ")
+            esn_response = s1c_ESN(s1cport)
+            # print("ESN Received:", esn_response)
             response = s1c_send_data(user_data, s1cport, msg_type)
             print(f"Respuesta {msg_type.upper()}: {response}")
 
