@@ -35,7 +35,7 @@ try:
         # Determine if gas is present or not
         if gas_present == GPIO.LOW:
             gas_state = "Gas Present"
-            log_event(gas_state)
+            #log_event(gas_state)
         else:
             gas_state = "No Gas"
 
