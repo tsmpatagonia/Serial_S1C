@@ -15,42 +15,46 @@ from random import randrange
 import json
 from random import randint
 import os
-import RPi.GPIO as GPIO
+
+########- ----------------------- REMOVE from test in RASPBERRY
+#import RPi.GPIO as GPIO
+########- ----------------------- REMOVE from test in RASPBERRY
+
 import time
 import datetime
 
 # Set up the GPIO mode
-GPIO.setmode(GPIO.BCM)
+#GPIO.setmode(GPIO.BCM)
 
 # Set up the GPIO pin for reading the DO output
-DO_PIN = 7  # Replace with the actual GPIO pin number
-GPIO.setup(DO_PIN, GPIO.IN)
+#DO_PIN = 7  # Replace with the actual GPIO pin number
+#GPIO.setup(DO_PIN, GPIO.IN)
 #NO ANDA GASREAD!!!!
-def gasRead():
-    try:
-        while True:
-            # Read the state of the DO pin
-            gas_present = GPIO.input(DO_PIN)
+#def gasRead():
+#    try:
+#        while True:
+#            # Read the state of the DO pin
+#            gas_present = GPIO.input(DO_PIN)
 
             # Determine if gas is present or not
-            if gas_present == GPIO.LOW:
-                gas_state = "Gas Present"
-                #log_event(gas_state)
-            else:
-                gas_state = "No Gas"
+#            if gas_present == GPIO.LOW:
+#                gas_state = "Gas Present"
+#                #log_event(gas_state)
+#            else:
+#                gas_state = "No Gas"
 
             # Print the gas state
-            print(f"Gas State: {gas_state}")
+#            print(f"Gas State: {gas_state}")
             # log_event(gas_state)
 
-            time.sleep(0.5)  # Wait for a short period before reading again
+#            time.sleep(0.5)  # Wait for a short period before reading again
 
-    except KeyboardInterrupt:
-        print("Gas detection stopped by user")
+#    except KeyboardInterrupt:
+#        print("Gas detection stopped by user")
 
-    finally:
+#    finally:
         # Clean up GPIO settings
-        GPIO.cleanup()
+#        GPIO.cleanup()
 
 
 def s1c_ESN(s1cport):
@@ -92,7 +96,7 @@ def s1c_ESN(s1cport):
 
         # Escribir el comando en el puerto serial
         ser.write(command)
-        time.sleep(5)
+        #time.sleep(5)
 
         # Leer la respuesta
         x = ser.read(256)
