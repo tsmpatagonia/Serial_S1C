@@ -26,31 +26,32 @@ GPIO.setmode(GPIO.BCM)
 # Set up the GPIO pin for reading the DO output
 DO_PIN = 7  # Replace with the actual GPIO pin number
 GPIO.setup(DO_PIN, GPIO.IN)
+#NO ANDA GASREAD!!!!
+def gasRead():
+    try:
+        while True:
+            # Read the state of the DO pin
+            gas_present = GPIO.input(DO_PIN)
 
-try:
-    while True:
-        # Read the state of the DO pin
-        gas_present = GPIO.input(DO_PIN)
+            # Determine if gas is present or not
+            if gas_present == GPIO.LOW:
+                gas_state = "Gas Present"
+                #log_event(gas_state)
+            else:
+                gas_state = "No Gas"
 
-        # Determine if gas is present or not
-        if gas_present == GPIO.LOW:
-            gas_state = "Gas Present"
-            #log_event(gas_state)
-        else:
-            gas_state = "No Gas"
+            # Print the gas state
+            print(f"Gas State: {gas_state}")
+            # log_event(gas_state)
 
-        # Print the gas state
-        print(f"Gas State: {gas_state}")
-        # log_event(gas_state)
+            time.sleep(0.5)  # Wait for a short period before reading again
 
-        time.sleep(0.5)  # Wait for a short period before reading again
+    except KeyboardInterrupt:
+        print("Gas detection stopped by user")
 
-except KeyboardInterrupt:
-    print("Gas detection stopped by user")
-
-finally:
-    # Clean up GPIO settings
-    GPIO.cleanup()
+    finally:
+        # Clean up GPIO settings
+        GPIO.cleanup()
 
 
 def s1c_ESN(s1cport):
