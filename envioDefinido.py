@@ -1,4 +1,3 @@
-import crcmod
 import os.path
 import sys
 import platform
@@ -93,6 +92,7 @@ def s1c_ESN(s1cport):
 
         # Escribir el comando en el puerto serial
         ser.write(command)
+        time.sleep(5)
 
         # Leer la respuesta
         x = ser.read(256)
@@ -131,10 +131,6 @@ def s1c_ESN(s1cport):
 
     except SerialException as e:
         print(f"ERROR: {e}")
-
-
-11
-
 
 def s1c_send_data(user_data, s1cport, msg_type):
     try:
