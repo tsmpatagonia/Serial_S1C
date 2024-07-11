@@ -174,6 +174,7 @@ def s1c_send_data(user_data, s1cport, msg_type):
         print(f"COMANDO GET {msg_type.upper()} DATA")
         crc16_func = crcmod.mkCrcFun(0x11021, initCrc=0x0000, xorOut=0xffff)
         command = bytearray.fromhex(array)
+        print(command)
 
         # Generar CRC basado en el comando dado
         result = hex(crc16_func(command))
@@ -186,6 +187,7 @@ def s1c_send_data(user_data, s1cport, msg_type):
         response = x.hex()
 
         if response:
+            print(command)
             print(array)
             print(response)
 
