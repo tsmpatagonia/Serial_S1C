@@ -184,8 +184,8 @@ def s1c_send_data(user_data, s1cport, msg_type):
         #crc_2 = unhexlify(result[4:6])
         command.extend(crc_2 + crc_1)  # appending CRC
 
-        ser.write(serial.to_bytes(command))
-        #ser.write(command)  # writing host command to smartOne
+        #ser.write(serial.to_bytes(command))
+        ser.write(command)  # writing host command to smartOne
         x = ser.read(256)
         response = x.hex()
 
