@@ -136,7 +136,7 @@ def s1c_ESN(s1cport):
     except SerialException as e:
         print(f"ERROR: {e}")
 
-def s1c_send_data(user_data, s1cport, msg_type):
+def s1c_send_data_ORIGINAL(user_data, s1cport, msg_type):
     try:
         ser = serial.Serial(port=s1cport, timeout=3, baudrate=9600, bytesize=8,
                             parity='N', stopbits=2, xonxoff=False)  # Serial connect port number
@@ -180,6 +180,8 @@ def s1c_send_data(user_data, s1cport, msg_type):
         result = hex(crc16_func(command))
         crc_1 = unhexlify(result[2:4])
         crc_2 = unhexlify(result[4:6])
+        #crc_1 = unhexlify(result[2:4])
+        #crc_2 = unhexlify(result[4:6])
         command.extend(crc_2 + crc_1)  # appending CRC
 
         ser.write(command)  # writing host command to smartOne
@@ -195,6 +197,69 @@ def s1c_send_data(user_data, s1cport, msg_type):
         return response
     except SerialException:
         print("ERROR ENVIAR DATA")
+
+def s1c_send_data(user_data, s1cport, msg_type):
+    try:
+        ser = serial.Serial(port=s1cport, timeout=3, baudrate=9600, bytesize=8,
+                            parity='N', stopbits=2, xonxoff=False)  # Serial connect port number
+
+        # Convertir datos de usuario a hexadecimal
+        datatobesend = user_data.encode('utf-8').hex()
+        
+        # Seleccionar el tipo de comando
+        if msg_type == "truncated":
+            cmd = "26"
+            max_data_len = 47  # Máximo de 47 bytes de datos de usuario para mensajes truncados
+        elif msg_type == "raw":
+            cmd = "27"
+            max_data_len = 53  # Máximo de 53 bytes de datos de usuario para mensajes RAW
+        else:
+            print("Tipo de mensaje no válido")
+            return
+
+        # Verificar que los datos de usuario no excedan el límite permitido
+        data_len = len(datatobesend) // 2
+        if data_len > max_data_len:
+            print(f"Los datos de usuario no pueden exceder {max_data_len} bytes")
+            return
+
+        # Longitud del comando en hexadecimal
+        length = format(5 + data_len, '02x')
+
+        # Construir el comando completo
+        array = f'aa{length}{cmd}{datatobesend}'
+
+        if ser.isOpen():
+            print("S1C port opened")
+
+        print(f"COMANDO GET {msg_type.upper()} DATA")
+        crc16_func = crcmod.mkCrcFun(0x11021, initCrc=0x0000, xorOut=0xffff)
+        command = bytearray.fromhex(array)
+
+        # Generar CRC basado en el comando dado
+        result = hex(crc16_func(command))[2:]  # Remove '0x' from the beginning
+        result = result.zfill(4)  # Ensure it's 4 characters long
+        crc_1 = unhexlify(result[2:])
+        crc_2 = unhexlify(result[:2])
+        command.extend(crc_2 + crc_1)  # Append CRC
+
+        # Enviar el comando al dispositivo
+        ser.write(serial.to_bytes(command))
+        x = ser.read(256)
+        response = x.hex()
+
+        if response:
+            print(f"Comando enviado: {binascii.hexlify(command).decode()}")
+            print(f"Array original: {array}")
+            print(f"Respuesta recibida: {response}")
+
+        ser.close()
+        return response
+    except serial.SerialException as e:
+        print(f"ERROR ENVIAR DATA: {e}")
+
+
+
 
 
 def read_pymodbus():
