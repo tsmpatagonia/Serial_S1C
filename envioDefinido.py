@@ -244,7 +244,8 @@ def s1c_send_data(user_data, s1cport, msg_type):
         command.extend(crc_2 + crc_1)  # Append CRC
 
         # Enviar el comando al dispositivo
-        ser.write(serial.to_bytes(command))
+        #ser.write(serial.to_bytes(command))
+        ser.write(command)  # writing host command to smartOne
         x = ser.read(256)
         response = x.hex()
 
