@@ -136,7 +136,7 @@ def s1c_ESN(s1cport):
     except SerialException as e:
         print(f"ERROR: {e}")
 
-def s1c_send_data_ORIGINAL(user_data, s1cport, msg_type):
+def s1c_send_data(user_data, s1cport, msg_type):
     try:
         ser = serial.Serial(port=s1cport, timeout=3, baudrate=9600, bytesize=8,
                             parity='N', stopbits=2, xonxoff=False)  # Serial connect port number
@@ -184,7 +184,8 @@ def s1c_send_data_ORIGINAL(user_data, s1cport, msg_type):
         #crc_2 = unhexlify(result[4:6])
         command.extend(crc_2 + crc_1)  # appending CRC
 
-        ser.write(command)  # writing host command to smartOne
+        ser.write(serial.to_bytes(command))
+        #ser.write(command)  # writing host command to smartOne
         x = ser.read(256)
         response = x.hex()
 
@@ -198,7 +199,7 @@ def s1c_send_data_ORIGINAL(user_data, s1cport, msg_type):
     except SerialException:
         print("ERROR ENVIAR DATA")
 
-def s1c_send_data(user_data, s1cport, msg_type):
+def s1c_send_data_MOD(user_data, s1cport, msg_type):
     try:
         ser = serial.Serial(port=s1cport, timeout=3, baudrate=9600, bytesize=8,
                             parity='N', stopbits=2, xonxoff=False)  # Serial connect port number
